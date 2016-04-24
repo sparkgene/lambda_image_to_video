@@ -1,40 +1,59 @@
 # -*- coding: utf-8 -*-
 
-import os.path
+import os
+import stat
+import shutil
 import boto3
 from datetime import datetime as dt
-from moviepy.editor import *
 import logging
 
 print('Loading function')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-s3 = boto3.client('s3')
-image_bucket = "set the input image bucket name"
-video_bucket = "set the output video bucket name"
-base_path = "/tmp"
-image_path = "{0}/{1}".format(base_path, "images")
-video_path = "{0}/{1}".format(base_path, "video")
+lambda_tmp_dir = '/tmp' # Lambda fuction can use this directory.
+image_path = "{0}/{1}".format(lambda_tmp_dir, "images")
+video_path = "{0}/{1}".format(lambda_tmp_dir, "video")
 video_name = "video.mp4"
+
+# ffmpeg is stored with this script.
+# When executing ffmpeg, execute permission is requierd.
+# But Lambda source directory do not have permission to change it.
+# So move ffmpeg binary to `/tmp` and add permission.
+ffmpeg_bin = "{0}/ffmpeg.linux64".format(lambda_tmp_dir)
+shutil.copyfile('/var/task/ffmpeg.linux64', ffmpeg_bin)
+os.environ['IMAGEIO_FFMPEG_EXE'] = ffmpeg_bin
+os.chmod(ffmpeg_bin, os.stat(ffmpeg_bin).st_mode | stat.S_IEXEC)
+
+from moviepy.editor import *
+
+s3 = boto3.client('s3')
+
+image_bucket = ""
+video_bucket = ""
 
 def prepare_path(target):
   if os.path.exists(target):
-    return
+    logger.info("{0} exists".format(target))
+    os.removedirs(target)
 
   os.mkdir(target)
+  if os.path.exists(target):
+    logger.info("{0} created".format(target))
 
 def copy_object(bucket, source, dest):
   name = source.split('/')[-1]
   local_file = "{0}/{1}".format(dest, name)
-  logger.info("{0} to {1}".format(source, local_file))
+  logger.debug("{0} to {1}".format(source, local_file))
   s3.download_file(bucket, source, local_file)
+  if os.path.exists(local_file):
+      b = open(local_file,"r")
 
   return local_file
 
 def create_video(images, video_file):
   images.sort()
-  logger.info("include images count:{0}".format(len(images)))
+  logger.info("create video from {0} images.".format(len(images)))
   clip = ImageSequenceClip(images, fps=1)
   clip.write_videofile(video_file)
   logger.info("video: {0}".format(video_file))

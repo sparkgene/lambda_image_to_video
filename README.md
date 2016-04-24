@@ -8,6 +8,11 @@ Input image must stored in s3 bucket with key like "yyyy/mm/dd/sequence_id.jpg".
 Output video type is mp4. The video created by lambda function is placed to bucket with key "yyyy/mm/yyyymmdd.mp4".
 All image with same key "yyyy/mm/dd", are stored in same video.
 
+### MoviePy
+https://pypi.python.org/pypi/moviepy
+MoviePy is a python module for video editing.
+This download ffmpeg automatically on first MoviePy call.
+
 ## Installation
 
 ```
@@ -26,7 +31,7 @@ video_bucket = "set the output video bucket name"
 ### Pack function
 
   ``` shell
-  zip -r func.zip . -x .git/**/*
+  zip -r func.zip . -x *.git*
   ```
   details
   http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html
