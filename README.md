@@ -15,26 +15,59 @@ This download ffmpeg automatically on first MoviePy call.
 
 ## Installation
 
+AWS Lambda do not have ffmpeg, so we need to include executable binary with lambda function.
+```
+sudo yum -y update
+sudo yum install -y git
+sudo yum -y install gcc-c++
+```
+
+clone repository
 ```
 git clone https://github.com/sparkgene/lambda_image_to_video
 pip install -r requirements.txt -t /path/to/lambda_image_to_video
 ```
 
-## Configuration
-
+clone numpy library
 ```
+git clone https://github.com/vitolimandibhrata/aws-lambda-numpy.git
+```
+
+copy numpy and library in to work directory.
+```
+cp -R aws-lambda-numpy/lib lambda_image_to_video/
+cp -R aws-lambda-numpy/numpy lambda_image_to_video/
+```
+
+download freeimage binary
+```
+wget https://github.com/imageio/imageio-binaries/raw/master/freeimage/libfreeimage-3.16.0-linux64.so -O lambda_image_to_video/lib/libfreeimage.so
+```
+
+download ffmpeg binary
+```
+wget https://github.com/imageio/imageio-binaries/raw/master/ffmpeg/ffmpeg.linux64 -O lambda_image_to_video/ffmpeg.linux64
+```
+
+set bucket name
+```
+cd lambda_image_to_video
+vi lambda_function.py
+
 image_bucket = "set the input image bucket name"
 video_bucket = "set the output video bucket name"
 ```
 
-## deploy
-### Pack function
+install MoviePy
+```
+pip install -r requirements.txt -t ./
+```
 
-  ``` shell
-  zip -r func.zip . -x *.git*
-  ```
-  details
-  http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html
+compress all files in to zip.
+```
+zip -r func.zip . -x *.git*
+```
+http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html
 
 ### Upload to your lambda function
   See details createing scheduled lambda function.
