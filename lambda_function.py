@@ -35,11 +35,9 @@ video_bucket = ""
 def prepare_path(target):
   if os.path.exists(target):
     logger.info("{0} exists".format(target))
-    os.removedirs(target)
+    shutil.rmtree(target)
 
   os.mkdir(target)
-  if os.path.exists(target):
-    logger.info("{0} created".format(target))
 
 def copy_object(bucket, source, dest):
   name = source.split('/')[-1]
