@@ -4,7 +4,7 @@ import os
 import stat
 import shutil
 import boto3
-from datetime import datetime as dt
+import datetime
 import logging
 
 print('Loading function')
@@ -69,7 +69,9 @@ def move_video(video_file, bucket, dest_key):
   logger.info("video moved to {0}/{1}".format(bucket, dest_key))
 
 def lambda_handler(event, context):
-  tdatetime = dt.now()
+  tdatetime = datetime.datetime.now()
+  # offset for Asia/Tokyo
+  tdatetime += datetime.timedelta(hours = 9)
   prefix = tdatetime.strftime('%Y/%m/%d/')
   result = s3.list_objects(
         Bucket=image_bucket,

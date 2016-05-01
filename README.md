@@ -22,15 +22,14 @@ sudo yum install -y git
 sudo yum -y install gcc-c++
 ```
 
-clone repository
-```
-git clone https://github.com/sparkgene/lambda_image_to_video
-pip install -r requirements.txt -t /path/to/lambda_image_to_video
-```
-
 clone numpy library
 ```
 git clone https://github.com/vitolimandibhrata/aws-lambda-numpy.git
+```
+
+clone repository
+```
+git clone https://github.com/sparkgene/lambda_image_to_video
 ```
 
 copy numpy and library in to work directory.
@@ -47,6 +46,12 @@ wget https://github.com/imageio/imageio-binaries/raw/master/freeimage/libfreeima
 download ffmpeg binary
 ```
 wget https://github.com/imageio/imageio-binaries/raw/master/ffmpeg/ffmpeg.linux64 -O lambda_image_to_video/ffmpeg.linux64
+```
+
+install python library
+```
+cd lambda_image_to_video
+pip install -r requirements.txt -t /path/to/lambda_image_to_video
 ```
 
 set bucket name
